@@ -14,46 +14,46 @@ npm i cycle-pool -S
 ## Usage
 
 ```typescript
-import Pool from 'cycle-pool';
-// for commonjs -> const Pool = require('cycle-pool').default;
+import { createPool } from 'cycle-pool';
 
-class TaskHandler {
-  // your heavy progress
-  async exec(a: number, b: number): Promise<number> {
-    await sleep(300);
+// simple usage
+class Calculator {
+  // your heavy precess
+  async add(a: number, b: number): Promise<number> {
+    return a + b;
+  }
+
+  async multiply(a: number, b: number): Promise<number> {
     return a * b;
   }
 }
 
-const pool = new Pool<TaskHandler>({
-  min: 10,
-  worker: TaskHandler,
-});
-
-async function test() {
-  for (let i = 0; i < 22; i++) {
-    ;(async function () {
-      const result = await pool.exec(i, i);
-
-      console.log('job:', i, 'result:', result, 'running:', pool.running, 'idle:', pool.idleSize);
-    })().catch((err) => {
-      console.error(err);
-    });
-  }
-}
-
-test();
+const pool = createPool<Calculator>(Calculator);
+const result = await pool.add(1, 2);
 ```
 
-also you can release resource manually
+also you can release worker manually
+
 ```typescript
 const worker = await pool.acquire();
-const result = await worker.exec(i, i);
+const result = await worker.multiply(2, 2);
 pool.release(worker);
-
-console.log('job:', i, 'result:', result, 'running:', pool.running, 'idle:', pool.idleSize);
 ```
 
+## API
+
+### createPool
+
+- createPool<T=any>(worker: new (...args: any[]) => T, options:Partial<typeof defaultOptions> = defaultOptions): Pool & T
+
+```javascript
+const defaultOptions = {
+  min: 1,
+  max: 10,
+  idleTimeout: 30 * 1000, // 30 second
+  acquireTimeout: 1000, // 1 second
+};
+```
 
 ## Examples
 
@@ -81,6 +81,7 @@ normal bcrypt
 ```
 
 after cycle-pool with `worker_threads`
+
 ```
 ┌─────────┬───────┬───────┬───────┬───────┬──────────┬─────────┬───────────┐
 │ Stat    │ 2.5%  │ 50%   │ 97.5% │ 99%   │ Avg      │ Stdev   │ Max       │
@@ -96,15 +97,11 @@ after cycle-pool with `worker_threads`
 └───────────┴────────┴────────┴────────┴────────┴────────┴─────────┴────────┘
 ```
 
-
-
-
 ## Todo
 
 - [ ] idle release
 
 ## Others
-
 
 ## License
 

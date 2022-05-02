@@ -3,43 +3,27 @@
  */
 import { createPool } from '../index';
 
+// simple usage
 class Calculator {
   // your heavy precess
   async add(a: number, b: number): Promise<number> {
-    await sleep(300);
     return a + b;
   }
 
   async multiply(a: number, b: number): Promise<number> {
-    await sleep(100);
     return a * b;
   }
 }
 
-const pool = createPool<Calculator>(Calculator, { min: 2 });
-console.log(pool);
+const pool = createPool<Calculator>(Calculator);
 
-async function test() {
-  let start = Date.now();
-  for (let i = 0; i < 25; i++) {
-    handle();
+// const result = await pool.add(1, 2);
 
-    async function handle() {
-      const result = await pool.add(i, i);
-      console.log('job:', i, 'result:', result, 'running:', pool.running, 'idle:', pool.idleSize);
-      if (pool.running === 0) {
-        console.log('total cost:', Date.now() - start, 'ms');
-      }
-    }
-  }
-}
-
-test();
-
-function random(min: number, max: number) {
-  return min + Math.random() * max;
-}
-
-function sleep(delay = 1000) {
-  return new Promise((resolve) => setTimeout(resolve, delay));
-}
+pool
+  .add(1, 2)
+  .then((ret) => {
+    console.log(ret);
+  })
+  .catch((err) => {
+    console.error(err);
+  });

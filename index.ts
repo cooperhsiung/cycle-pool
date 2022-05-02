@@ -12,28 +12,31 @@ const defaultOptions = {
 // destroy, release,
 // auto recycle?
 
-export function createPool<T=any>(worker: new (...args: any[]) => T, options:Partial<typeof defaultOptions> = defaultOptions): Pool & T {
-  const p = new Pool<any>({
-    worker: worker,
+export function createPool<T = any>(
+  Worker: new (...args: any[]) => T,
+  options: Partial<typeof defaultOptions> = defaultOptions
+): Pool & T {
+  const pool = new Pool<any>({
+    worker: Worker,
     ...options,
   });
 
-  const methods = Object.getOwnPropertyNames(worker.prototype);
-  const poolProps = Object.getOwnPropertyNames(Pool.prototype);
+  const methods = Object.getOwnPropertyNames(Worker.prototype);
+  const protectMethods = Object.getOwnPropertyNames(Pool.prototype);
 
-  // delegate method
   for (const method of methods) {
     if (method === 'constructor') {
       continue;
     }
-    if (poolProps.includes(method)) {
+    if (protectMethods.includes(method)) {
       console.warn(`${method} failed to delegate because it is a method of pool`);
       continue;
     }
 
-    Object.defineProperty(p, method, {
+    // delegate methods
+    Object.defineProperty(pool, method, {
       value: async function (...args: any) {
-        const worker = await p.acquire();
+        const worker = await pool.acquire();
         if (worker[method]) {
           const result = await worker[method](...args);
           this.release(worker);
@@ -44,10 +47,10 @@ export function createPool<T=any>(worker: new (...args: any[]) => T, options:Par
     });
   }
 
-  return p as any;
+  return pool as Pool & T;
 }
 
-export default class Pool<T = any> {
+class Pool<T = any> {
   private min: number;
   private max: number;
   private idleTimeout: number;
@@ -63,7 +66,7 @@ export default class Pool<T = any> {
     this.max = options.max || defaultOptions.max;
     this.idleTimeout = options.idleTimeout || defaultOptions.idleTimeout;
     this.acquireTimeout = options.acquireTimeout || defaultOptions.acquireTimeout;
-    // init workers
+    // initialize workers
     this.factory = options.worker;
     this.idleQueue = Array(this.min)
       .fill(1)
@@ -89,18 +92,6 @@ export default class Pool<T = any> {
       }
     });
   }
-
-  // execute task directly
-  // async exec(...args: any) {
-  //   const worker = await this.acquire();
-  //   if (worker.exec) {
-  //     const result = await worker.exec(...args);
-  //     this.release(worker);
-  //     return result;
-  //   } else {
-  //     throw new Error('worker does not implement a exec function');
-  //   }
-  // }
 
   // put a worker back to the pool
   release(worker: T) {

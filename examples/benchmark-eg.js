@@ -12,14 +12,10 @@ const bcryptHash = async (password) => {
 
 const Utilities = { bcryptHash };
 
-const Pool = require('cycle-pool').default;
+const { createPool } = require('cycle-pool');
 const TaskHandler = require('./util');
 
-const pool = new Pool({
-  min: 10,
-  max: 1000,
-  worker: TaskHandler,
-});
+const pool = createPool(TaskHandler, { min: 10, max: 1000 });
 
 // Router Setup
 App.get('/bcrypt', async (req, res) => {

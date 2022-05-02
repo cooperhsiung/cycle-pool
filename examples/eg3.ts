@@ -1,33 +1,37 @@
 /**
  * Created by Cooper on 2021/06/16.
  */
-import Pool  from '../index';
+import { createPool } from '../index';
 
-class TaskHandler {
-  // your heavy progress
-  async exec(a: number, b: number): Promise<number> {
+// get cost
+class Calculator {
+  // your heavy precess
+  async add(a: number, b: number): Promise<number> {
     await sleep(300);
+    return a + b;
+  }
+
+  async multiply(a: number, b: number): Promise<number> {
+    await sleep(100);
     return a * b;
   }
 }
 
-const pool = new Pool<TaskHandler>({
-  min: 10,
-  max: 15,
-  worker: TaskHandler,
-});
+const pool = createPool<Calculator>(Calculator, { min: 2 });
+console.log(pool);
 
 async function test() {
-  for (let i = 0; i < 22; i++) {
-    (async function () {
-      const worker = await pool.acquire();
-      const result = await worker.exec(i, i);
-      pool.release(worker);
+  let start = Date.now();
+  for (let i = 0; i < 25; i++) {
+    handle();
 
+    async function handle() {
+      const result = await pool.add(i, i);
       console.log('job:', i, 'result:', result, 'running:', pool.running, 'idle:', pool.idleSize);
-    })().catch((err) => {
-      console.error(err);
-    });
+      if (pool.running === 0) {
+        console.log('total cost:', Date.now() - start, 'ms');
+      }
+    }
   }
 }
 
