@@ -23,7 +23,7 @@ App.get('/bcrypt', async (req, res) => {
   let result = null;
 
   if (process.env.WORKER_POOL_ENABLED === '1') {
-    result = await pool.exec(password);
+    result = await pool.encrypt(password);
   } else {
     result = await Utilities.bcryptHash(password);
   }

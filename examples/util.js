@@ -36,7 +36,7 @@ class TaskHandler {
     }
   }
 
-  exec(str) {
+  encrypt(str) {
     if (isMainThread) {
       this.worker.postMessage(str);
       return new Promise((resolve, reject) => {
@@ -51,7 +51,7 @@ class TaskHandler {
 if (isMainThread) {
   let handler = new TaskHandler();
   handler
-    .exec('asds')
+    .encrypt('asds')
     .then((ret) => {
       console.log(ret);
     })
