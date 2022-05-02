@@ -1,0 +1,26 @@
+{
+  "name": "cycle-pool",
+  "version": "1.0.5",
+  "description": "make resource pooling",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc --declaration",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cooperhsiung/cycle-pool.git"
+  },
+  "keywords": [
+    "pool"
+  ],
+  "author": "cooperhsiung",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cooperhsiung/cycle-pool/issues"
+  },
+  "homepage": "https://github.com/cooperhsiung/cycle-pool#readme",
+  "devDependencies": {
+    "@types/node": "^15.12.2"
+  }
+}
