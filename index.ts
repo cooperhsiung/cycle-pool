@@ -35,10 +35,10 @@ export function createPool<T = any>(
 
     // delegate methods
     Object.defineProperty(pool, method, {
-      value: async function (...args: any) {
+      value: async function () {
         const worker = await pool.acquire();
         if (worker[method]) {
-          const result = await worker[method](...args);
+          const result = await worker[method](...arguments);
           this.release(worker);
           return result;
         }
@@ -50,7 +50,7 @@ export function createPool<T = any>(
   return pool as Pool & T;
 }
 
-class Pool<T = any> {
+export class Pool<T = any> {
   private min: number;
   private max: number;
   private idleTimeout: number;
