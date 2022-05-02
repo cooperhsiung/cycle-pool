@@ -97,6 +97,8 @@ use `worker_threads` managed by `cycle-pool`
 └───────────┴────────┴────────┴────────┴────────┴────────┴─────────┴────────┘
 ```
 
+near 7x faster than normal bcrypt
+
 ## Todo
 
 - [ ] idle release
