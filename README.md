@@ -97,7 +97,7 @@ use `worker_threads` managed by `cycle-pool`
 └───────────┴────────┴────────┴────────┴────────┴────────┴─────────┴────────┘
 ```
 
-near 7x faster than normal bcrypt
+:rocket: near 7x faster than normal bcrypt
 
 ## Todo
 
